@@ -1,6 +1,6 @@
 {
   "name": "ai-chang",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "AI-powered changelog generator based on git changes",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

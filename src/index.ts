@@ -161,7 +161,7 @@ program
   .description('Generate AI-powered release notes from git tags')
   .version('1.0.0')
   .requiredOption('-f, --from <tag>', 'Starting tag or commit')
-  .requiredOption('-t, --to <tag>', 'Ending tag or commit')
+  .option('-t, --to <tag>', 'Ending tag or commit (defaults to HEAD)')
   .option('-o, --output <file>', 'Output file (optional)')
   .option('-k, --api-key <key>', 'OpenAI API Key (can also be set via OPENAI_API_KEY environment variable)')
   .option('-d, --detailed', 'Generate detailed changelog with technical information')
@@ -172,7 +172,8 @@ program
         apiKey: getApiKey(options)
       });
 
-      const changelog = await generateChangelog(options.from, options.to, options.detailed);
+      const toRef = options.to || 'HEAD';
+      const changelog = await generateChangelog(options.from, toRef, options.detailed);
       
       if (options.output) {
         fs.writeFileSync(options.output, changelog);
