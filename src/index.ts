@@ -1,5 +1,15 @@
 #!/usr/bin/env node
 
+// Disable warning about deprecated punycode module
+process.removeAllListeners('warning');
+process.on('warning', (warning) => {
+  if (warning.name === 'DeprecationWarning' && 
+      warning.message.includes('The `punycode` module is deprecated')) {
+    return;
+  }
+  console.warn(warning);
+});
+
 import { Command } from 'commander';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
@@ -7,7 +17,7 @@ import path from 'path';
 import { execSync } from 'child_process';
 import fs from 'fs';
 
-// Загружаем переменные окружения
+// Load environment variables
 dotenv.config();
 
 let openai: OpenAI;
@@ -17,17 +27,17 @@ interface FileChange {
   diff: string;
 }
 
-// Функция для получения API ключа
+// Function to get API key
 function getApiKey(options: { apiKey?: string }): string {
-  // Приоритет:
-  // 1. Ключ из параметров командной строки
-  // 2. OPENAI_API_KEY из GitHub Actions
-  // 3. OPENAI_API_KEY из .env или системных переменных окружения
+  // Priority:
+  // 1. Command line parameter
+  // 2. OPENAI_API_KEY from GitHub Actions
+  // 3. OPENAI_API_KEY from .env or system environment variables
   if (options.apiKey) {
     return options.apiKey;
   }
 
-  // Проверяем, запущен ли скрипт в GitHub Actions
+  // Check if running in GitHub Actions
   if (process.env.GITHUB_ACTIONS === 'true') {
     if (!process.env.OPENAI_API_KEY) {
       throw new Error('OPENAI_API_KEY not found in GitHub Actions secrets. Please add it to your repository secrets.');
@@ -35,7 +45,7 @@ function getApiKey(options: { apiKey?: string }): string {
     return process.env.OPENAI_API_KEY;
   }
 
-  // Проверяем локальные переменные окружения
+  // Check local environment variables
   if (!process.env.OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY not found. Please provide it via --api-key option or set it in .env file');
   }
@@ -44,13 +54,13 @@ function getApiKey(options: { apiKey?: string }): string {
 }
 
 async function getFileChanges(fromTag: string, toTag: string): Promise<FileChange[]> {
-  // Получаем список измененных файлов
+  // Get list of changed files
   const changedFiles = execSync(`git diff --name-only ${fromTag}..${toTag}`).toString().split('\n').filter(Boolean);
   const changes: FileChange[] = [];
 
   for (const file of changedFiles) {
     try {
-      // Получаем diff для каждого файла с контекстом
+      // Get diff for each file with context
       const fileDiff = execSync(`git diff ${fromTag}..${toTag} -- "${file}"`).toString();
       if (fileDiff) {
         changes.push({
@@ -59,7 +69,7 @@ async function getFileChanges(fromTag: string, toTag: string): Promise<FileChang
         });
       }
     } catch (error) {
-      console.warn(`Не удалось получить diff для файла ${file}:`, error instanceof Error ? error.message : String(error));
+      console.warn(`Failed to get diff for file ${file}:`, error instanceof Error ? error.message : String(error));
     }
   }
 
@@ -70,7 +80,7 @@ function summarizeChanges(changes: FileChange[]): string {
   let summary = '';
   
   for (const change of changes) {
-    // Добавляем только первые 50 строк диффа для каждого файла, чтобы не превышать лимиты токенов
+    // Add only first 50 lines of diff for each file to avoid token limits
     const diffLines = change.diff.split('\n').slice(0, 50);
     summary += `\nFile: ${change.file}\n`;
     summary += `${diffLines.join('\n')}\n`;
@@ -85,15 +95,15 @@ function summarizeChanges(changes: FileChange[]): string {
 
 async function generateChangelog(fromTag: string, toTag: string, detailed = false): Promise<string> {
   try {
-    // Получаем базовую информацию
+    // Get basic information
     const fileStatus = execSync(`git diff ${fromTag}..${toTag} --name-status`).toString();
     const commits = execSync(`git log ${fromTag}..${toTag} --pretty=format:"%h - %s"`).toString();
     
-    // Получаем детальные изменения в коде
+    // Get detailed code changes
     const changes = await getFileChanges(fromTag, toTag);
     const codeChanges = summarizeChanges(changes);
 
-    // Формируем промпт для AI
+    // Form prompt for AI
     const prompt = detailed ? 
       `Please analyze these git changes and generate a detailed technical changelog in markdown format.` :
       `Please analyze these git changes and generate a concise, high-level changelog in markdown format. Focus only on the most important changes and keep each entry brief (1-2 lines max).`;
@@ -115,7 +125,7 @@ async function generateChangelog(fromTag: string, toTag: string, detailed = fals
     - ${detailed ? 'Provide technical details and impact' : 'Keep it brief and high-level'}
     - Use bullet points for better readability`;
 
-    // Генерируем changelog с помощью AI
+    // Generate changelog using AI
     const completion = await openai.chat.completions.create({
       model: "gpt-4-turbo-preview",
       messages: [
@@ -157,7 +167,7 @@ program
   .option('-d, --detailed', 'Generate detailed changelog with technical information')
   .action(async (options) => {
     try {
-      // Инициализируем OpenAI с ключом
+      // Initialize OpenAI with key
       openai = new OpenAI({
         apiKey: getApiKey(options)
       });
