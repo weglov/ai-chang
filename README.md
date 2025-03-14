@@ -1,4 +1,4 @@
-# Release Notes AI
+# ai-chang
 
 An AI-powered tool for automatically generating technical changelogs based on git changes between releases.
 
@@ -7,17 +7,17 @@ An AI-powered tool for automatically generating technical changelogs based on gi
 ### Global Installation
 
 ```bash
-npm install -g @viktorshcheglov/release-notes-ai
+npm install -g ai-chang
 ```
 
 ### Local Project Installation
 
 ```bash
 # npm
-npm install --save-dev @viktorshcheglov/release-notes-ai
+npm install --save-dev ai-chang
 
 # yarn
-yarn add -D @viktorshcheglov/release-notes-ai
+yarn add -D ai-chang
 ```
 
 ## Usage
@@ -29,9 +29,9 @@ yarn add -D @viktorshcheglov/release-notes-ai
 ```json
 {
   "scripts": {
-    "changelog": "release-notes-ai --from",
-    "changelog:detailed": "release-notes-ai --from $npm_config_from --to $npm_config_to --detailed",
-    "changelog:save": "release-notes-ai --from $npm_config_from --to $npm_config_to --output CHANGELOG.md"
+    "changelog": "ai-chang --from",
+    "changelog:detailed": "ai-chang --from $npm_config_from --to $npm_config_to --detailed",
+    "changelog:save": "ai-chang --from $npm_config_from --to $npm_config_to --output CHANGELOG.md"
   }
 }
 ```
@@ -53,13 +53,13 @@ npm run changelog:save --from=v1.0.0 --to=v1.1.0
 
 ```bash
 # If installed globally
-release-notes-ai --from v1.0.0 --to v1.1.0
+ai-chang --from v1.0.0 --to v1.1.0
 
 # Using npx
-npx @viktorshcheglov/release-notes-ai --from v1.0.0 --to v1.1.0
+npx ai-chang --from v1.0.0 --to v1.1.0
 
 # Save to file
-release-notes-ai --from v1.0.0 --to v1.1.0 --output CHANGELOG.md
+ai-chang --from v1.0.0 --to v1.1.0 --output CHANGELOG.md
 ```
 
 ## Parameters
@@ -77,7 +77,7 @@ There are several ways to provide the API key (in order of priority):
 1. Via command line parameter:
 
 ```bash
-release-notes-ai --from v1.0.0 --to v1.1.0 --api-key your-api-key
+ai-chang --from v1.0.0 --to v1.1.0 --api-key your-api-key
 ```
 
 2. Via environment variable in CI/CD (e.g., GitHub Actions):
@@ -135,7 +135,7 @@ jobs:
         run: |
           # Get previous tag
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
-          npx @viktorshcheglov/release-notes-ai --from $PREV_TAG --to ${{ github.ref_name }} --output CHANGELOG.md
+          npx ai-chang --from $PREV_TAG --to ${{ github.ref_name }} --output CHANGELOG.md
 ```
 
 ## Requirements

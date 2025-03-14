@@ -1,18 +1,19 @@
 {
-  "name": "@viktorshcheglov/release-notes-ai",
+  "name": "ai-chang",
   "version": "1.0.0",
-  "description": "AI-powered changelog generator",
+  "description": "AI-powered changelog generator based on git changes",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "commonjs",
   "bin": {
-    "release-notes-ai": "./dist/index.js"
+    "ai-chang": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build",
     "start": "node dist/index.js",
     "dev": "ts-node src/index.ts",
+    "changelog": "node dist/index.js",
     "lint": "eslint src/**/*.ts",
     "format": "prettier --write \"src/**/*.ts\""
   },
@@ -27,7 +28,9 @@
     "ai",
     "git",
     "openai",
-    "automation"
+    "automation",
+    "git-changelog",
+    "release-management"
   ],
   "author": "Viktor Shcheglov",
   "license": "MIT",
@@ -47,11 +50,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/viktorshcheglov/release-notes-ai"
+    "url": "https://github.com/viktorshcheglov/ai-chang"
   },
-  "publishConfig": {
-    "access": "public"
+  "bugs": {
+    "url": "https://github.com/viktorshcheglov/ai-chang/issues"
   },
+  "homepage": "https://github.com/viktorshcheglov/ai-chang#readme",
   "engines": {
     "node": ">=18.0.0"
   }

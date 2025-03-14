@@ -157,7 +157,7 @@ async function generateChangelog(fromTag: string, toTag: string, detailed = fals
 const program = new Command();
 
 program
-  .name('release-notes-ai')
+  .name('ai-chang')
   .description('Generate AI-powered release notes from git tags')
   .version('1.0.0')
   .requiredOption('-f, --from <tag>', 'Starting tag or commit')
